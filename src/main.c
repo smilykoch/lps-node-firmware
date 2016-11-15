@@ -84,7 +84,7 @@ static void main_task(void *pvParameters) {
   printf("\r\n");
 
   // Initializing pressure sensor (if present ...)
-  lps25hInit(&hi2c1);
+  /*lps25hInit(&hi2c1);
   testSupportPrintStart("Initializing pressure sensor");
   if (lps25hTestConnection()) {
     printf("[OK]\r\n");
@@ -96,13 +96,17 @@ static void main_task(void *pvParameters) {
 
   testSupportPrintStart("Pressure sensor self-test");
   testSupportReport(&selftestPasses, lps25hSelfTest());
-
+*/
   // Initializing i2c eeprom
   eepromInit(&hi2c1);
   testSupportPrintStart("EEPROM self-test");
   testSupportReport(&selftestPasses, eepromTest());
 
+  //selftestPasses = false;
   cfgInit();
+
+//while(1);
+
 
   // Initialising radio
   testSupportPrintStart("Initialize UWB ");

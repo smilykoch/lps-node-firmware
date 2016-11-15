@@ -163,8 +163,6 @@ void __attribute__((optimize("O0"))) printHardFault(unsigned int* hardfault_args
   // Bus Fault Address Register
   _BFAR = (*((volatile unsigned long *)(0xE000ED38))) ;
 
-  while (1)
-  {
     printf("\r\n[Hard fault handler]\r\n");
     printf("R0   = 0x%X\r\n", stacked_r0);
     printf("R1   = 0x%X\r\n", stacked_r1);
@@ -180,6 +178,8 @@ void __attribute__((optimize("O0"))) printHardFault(unsigned int* hardfault_args
     printf("HFSR = 0x%X\r\n", _HFSR);
     printf("DFSR = 0x%X\r\n", _DFSR);
     printf("AFSR = 0x%X\r\n", _AFSR);
+  while (1)
+  {
   }
 }
 

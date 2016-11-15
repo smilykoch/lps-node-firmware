@@ -98,6 +98,7 @@ static void write_crc(void) {
 }
 
 static bool check_crc(void) {
+
   int total_len = SIZE_HEADER + SIZE_TAIL + cfgHeader->tlvSize;
   uint8_t ref_checksum = buffer[total_len - SIZE_TAIL];
   int i;

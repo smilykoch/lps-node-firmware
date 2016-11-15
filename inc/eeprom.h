@@ -7,9 +7,9 @@
 
 void eepromInit(I2C_HandleTypeDef * i2c);
 
-bool eepromRead(int address, void* data, size_t length);
+bool eepromRead(int address, uint8_t* data, size_t length);
 
-bool eepromWrite(int address, void* data, size_t length);
+bool eepromWrite(int address, uint8_t* data, size_t length);
 
 bool eepromTest();
 

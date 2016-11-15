@@ -29,42 +29,91 @@
 #include <string.h>
 
 #include "eeprom.h"
+#include "eeprom_emul.h"
 
-static I2C_HandleTypeDef * hi2c;
-static int devAddr = 0xA0;
+
+#define X_ (0)
+
+uint16_t VirtAddVarTab[NB_OF_VAR];
+uint16_t VarValue = 0;
 
 void eepromInit(I2C_HandleTypeDef * i2c)
 {
-  hi2c = i2c;
+  HAL_FLASH_Unlock();
+
+  int i = 0;
+  for(i = 0; i < NB_OF_VAR; i++){
+    VirtAddVarTab[i] = 0x5555 + i;
+  }
+
+
+  HAL_StatusTypeDef status = HAL_OK;
+  status = EE_Init();
+  if(status != HAL_OK){
+    printf("Failed initializing EEPROM!\r\n");
+  }else{
+    printf("Success initializing EEPROM!\r\n");
+  }
+
+  /*for(i = 0; i < NB_OF_VAR; i++){
+    EE_WriteVariable(VirtAddVarTab[i], 0);   
+  }*/
+
+  HAL_FLASH_Lock();
 }
 
 bool eepromTest()
 {
   uint8_t test;
-
   return eepromRead(0, &test, 1);
 }
 
-bool eepromRead(int address, void* data, size_t length)
+bool eepromRead(int address, uint8_t* data, size_t length)
 {
-  int status;
+  HAL_StatusTypeDef status = HAL_OK;
+  int i = 0;
+  uint16_t data_16;
+  HAL_FLASH_Unlock();
 
-  status = HAL_I2C_Mem_Read(hi2c, devAddr, address, I2C_MEMADD_SIZE_16BIT, data, length, 100);
 
-  if (status == HAL_OK)
-    return true;
 
-  return false;
+  for (i = 0; i < length; i++){       
+    status = EE_ReadVariable(VirtAddVarTab[i] + address, &data_16);
+    if (status != HAL_OK){
+      HAL_FLASH_Lock();
+      return false;
+    }
+    data[i] = (uint8_t)(data_16 & 0x00FF); 
+  }
+
+  HAL_FLASH_Lock();
+
+
+  return true;
+
 }
 
-bool eepromWrite(int address, void* data, size_t length)
+bool eepromWrite(int address, uint8_t* data, size_t length)
 {
-  int status;
+  HAL_StatusTypeDef status = HAL_OK;
+  int i = 0;
+  uint16_t data_16;
 
-  status = HAL_I2C_Mem_Write(hi2c, devAddr, address, I2C_MEMADD_SIZE_16BIT, data, length, 100);
+  HAL_FLASH_Unlock();
 
-  if (status == HAL_OK)
-    return true;
 
-  return false;
+  for (i = 0; i < length; i++){       
+    data_16 = (data[i] & 0x00FF);  
+    status = EE_WriteVariable(VirtAddVarTab[i] + address, data_16);   
+    if (status != HAL_OK){
+      HAL_FLASH_Lock();
+
+      return false;  
+    }
+  } 
+
+  HAL_FLASH_Lock();
+
+
+  return true;
 }
